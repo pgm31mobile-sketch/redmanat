@@ -27,9 +27,38 @@ body { margin:0; background:#0c0c0c; font-family:Arial,sans-serif; color:white; 
 
 .start-btn { position:absolute; right:20px; top:50%; transform:translateY(-50%); background:#e42020; padding:12px 22px; border-radius:14px; font-size:17px; border:none; color:white; font-weight:bold; cursor:pointer; }
 
-.bottom-nav { position:fixed; bottom:0; left:0; width:100%; background:#111; padding:10px 0 8px; display:flex; justify-content:space-around; border-top:1px solid #333; }
-.nav-item { text-align:center; font-size:13px; color:#bbb; }
-.active { color:#ff3a3a !important; font-weight:bold; }
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #1a1a1a;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 14px 0;
+    border-top: 1px solid #333;
+    box-sizing: border-box;
+    z-index: 999;
+    gap: 2px;
+}
+
+.nav-item {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    color: #bbb;
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.nav-item.active {
+    color: #ff3d3d;
+    font-weight: bold;
+}
+
+.nav-item br {
+    line-height: 1.1;
+}
 </style>
 </head>
 <body>
@@ -75,94 +104,33 @@ body { margin:0; background:#0c0c0c; font-family:Arial,sans-serif; color:white; 
     <div class="nav-item" onclick="window.location.href='withdraw.html'">💲<br>Çıxarış</div>
 </div>
 
-<style>
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #1a1a1a;
-    display: flex;
-    justify-content: space-evenly; /* divlər bərabər paylanır */
-    padding: 14px 0; /* hündürlük artırıldı, barmaq rahat */
-    border-top: 1px solid #333;
-    box-sizing: border-box;
-    z-index: 999;
-    gap: 2px; /* divlər arasındakı məsafə */
-}
-
-.nav-item {
-    flex: 1;               /* bütün itemlər bərabər eni */
-    text-align: center;
-    font-size: 14px;       /* icon+yazı ölçüsü */
-    color: #bbb;
-    cursor: pointer;
-    padding: 8px 0;        /* icon-yazı ətrafı boşluq */
-}
-
-.nav-item.active {
-    color: #ff3d3d;
-    font-weight: bold;
-}
-
-.nav-item br {
-    line-height: 1.1;      /* icon ilə yazı arasındakı məsafə */
-}
-</style>
-
 <script>
-/* ====================================================
-   USERDATA JSON OXUMA & YARATMA (HOME.HTM ilə EYNİ)
-==================================================== */
-let userData = JSON.parse(localStorage.getItem("userData"));
-
-if (!userData) {
-    userData = {
-        name: "",
-        tag: "",
-        balans: 0,
-        ads: 0,
-        totalads: 50,
-        tasks: {}
-    };
-}
-
-// Əgər tasks yoxdursa — undefined problemini aradan qaldırırıq
-if (!userData.tasks) {
-    userData.tasks = {};
-}
+let userData = JSON.parse(localStorage.getItem("userData")) || {
+    name: "", tag: "", balans: 0, ads: 0, totalads: 50, tasks: {}
+};
 
 // Balansı ekranda göstər
 document.getElementById("bal").textContent = userData.balans.toFixed(3) + " ₼";
 
-
-/* ====================================================
-   TAPŞIRIQ İDARƏETMƏ SİSTEMİ (QALICI)
-==================================================== */
+// TAPŞIRIQ İDARƏETMƏ SİSTEMİ
 document.querySelectorAll(".task-item").forEach(task => {
-
     const taskId = task.dataset.taskId;
     const reward = parseFloat(task.dataset.reward);
     const btn = task.querySelector(".start-btn");
 
-    // Tapşırığı tamamlayan funksiya
     function completeTask() {
-        if (userData.tasks[taskId]) return;  // Artıq edilibsə, çıx
+        if (userData.tasks[taskId]) return;
 
-        userData.balans += reward;
-        userData.tasks[taskId] = true; // <<< QALICI SAXLANMA YERİ
-
+        userData.tasks[taskId] = true; // QALICI SAXLA
         localStorage.setItem("userData", JSON.stringify(userData));
 
-        // UI yenilə
-        document.getElementById("bal").textContent = userData.balans.toFixed(3) + " ₼";
         btn.textContent = "Tamamlandı";
         btn.disabled = true;
         btn.style.background = "#0f0";
         task.style.border = "2px solid #0f0";
     }
 
-    // Səhifə yenilənəndə tamamlanıbsa — hər dəfə yaşıl göstər
+    // Yeniləndə tamamlanan tapşırıqları yaşıl göstər
     if (userData.tasks[taskId] === true) {
         btn.textContent = "Tamamlandı";
         btn.disabled = true;
@@ -170,12 +138,12 @@ document.querySelectorAll(".task-item").forEach(task => {
         task.style.border = "2px solid #0f0";
     }
 
-    // Başla düyməsi klik
+    // Başla düyməsi kliklənəndə yalnız tapşırıq tamamlanır
     btn.onclick = function () {
         if (userData.tasks[taskId]) return;
 
-        window.open("https://t.me/ads_reklam69", "_blank");
         completeTask();
+        // Reklam izləməyi balans artırmaq üçün ayrıca yerləşdirə bilərsən, tapşırığa təsir etmir
     };
 });
 </script>
