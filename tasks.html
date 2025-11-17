@@ -92,6 +92,7 @@
         cursor: pointer;
         min-width: 70px;
         text-align: center;
+        transition: 0.3s;
     }
 
     .start-btn.disabled {
@@ -110,7 +111,35 @@
         font-weight: 600;
         display: none;
         box-shadow: 0 0 15px rgba(0,255,100,0.4);
+        z-index: 999;
     }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #111;
+        padding: 10px 0;
+        display: flex;
+        justify-content: space-around;
+        border-top: 1px solid #2a2a2a;
+        z-index: 999;
+    }
+
+    .bottom-nav div {
+        color: #b3b3b3;
+        text-align: center;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .active {
+        color: #E72424 !important;
+    }
+
+    body { padding-bottom: 80px; }
 </style>
 </head>
 <body>
@@ -139,8 +168,17 @@
     <div class="start-btn" id="task1btn" onclick="startTask()">Başla</div>
 </div>
 
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+    <div onclick="window.location.href='home.html'">🏠<br>Ev</div>
+    <div class="active" onclick="window.location.href='tasks.html'">📝<br>Tapşırıqlar</div>
+    <div onclick="window.location.href='leaders.html'">📈<br>Liderlər</div>
+    <div onclick="window.location.href='friends.html'">👥<br>Dostlar</div>
+    <div onclick="window.location.href='withdraw.html'">💲<br>Çıxarış</div>
+</div>
+
 <script>
-/* ========== BALANCE LOAD ========== */
+/* ========== BALANS ========== */
 if (!localStorage.getItem("balance")) {
     localStorage.setItem("balance", "0.000");
 }
@@ -155,6 +193,7 @@ loadBalance();
 
 /* ========== START TASK ========== */
 function startTask() {
+    // Telegram link
     window.open("https://t.me/ads_reklam69", "_blank");
 
     let btn = document.getElementById("task1btn");
@@ -189,11 +228,11 @@ function completeMission() {
     localStorage.setItem("balance", bal.toFixed(3));
     loadBalance();
 
-    // SHOW TOAST
+    // TOAST
     showToast("Balansınıza +0.010 ₼ əlavə olundu");
 }
 
-/* ========== TOAST NOTIFICATION ========== */
+/* ========== TOAST FUNC ========== */
 function showToast(text) {
     let toast = document.getElementById("toast");
     toast.innerText = text;
