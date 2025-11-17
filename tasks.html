@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<title>Tapşırıqlar</title>
+<style>
+    body {
+        margin: 0;
+        background: #0f0f0f;
+        font-family: Arial, sans-serif;
+        color: white;
+        overscroll-behavior: none;
+        touch-action: manipulation;
+    }
+
+    .container {
+        padding: 15px;
+        padding-bottom: 120px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #ff3d3d;
+    }
+
+    .task-card {
+        background: #1a1a1a;
+        border-radius: 20px;
+        padding: 18px;
+        margin-bottom: 18px;
+    }
+
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .task-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .task-desc {
+        color: #aaa;
+        margin-top: 5px;
+    }
+
+    .progress {
+        width: 100%;
+        height: 8px;
+        background: #333;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+
+    .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: #ff2e2e;
+        border-radius: 10px;
+    }
+
+    .complete-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 14px;
+        background: #ff2e2e;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 8px;
+    }
+
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #1a1a1a;
+        padding: 12px 0;
+        display: flex;
+        justify-content: space-around;
+        border-top: 1px solid #333;
+    }
+
+    .bottom-nav div {
+        text-align: center;
+        font-size: 13px;
+        color: #bbb;
+    }
+
+    .active {
+        color: #ff3d3d !important;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tapşırıqlar</h1>
+
+    <!-- TASK EXAMPLE CARD -->
+    <div class="task-card" data-id="1">
+        <div class="task-header">
+            <div class="task-title">Gündəlik giriş</div>
+            <div class="task-points">+0.005 ₼</div>
+        </div>
+        <div class="task-desc">Hesabınıza daxil olun və mükafatı qazanın.</div>
+        <div class="progress">
+            <div class="progress-bar" id="progress1"></div>
+        </div>
+        <button class="complete-btn" onclick="completeTask(1)">Tamamla</button>
+    </div>
+
+    <div class="task-card" data-id="2">
+        <div class="task-header">
+            <div class="task-title">Reklam izləyin</div>
+            <div class="task-points">+0.001 ₼</div>
+        </div>
+        <div class="task-desc">1 reklam izləyərək balansınızı artırın.</div>
+        <div class="progress">
+            <div class="progress-bar" id="progress2"></div>
+        </div>
+        <button class="complete-btn" onclick="completeTask(2)">Tamamla</button>
+    </div>
+
+    <div class="task-card" data-id="3">
+        <div class="task-header">
+            <div class="task-title">Dost dəvət edin</div>
+            <div class="task-points">+0.010 ₼</div>
+        </div>
+        <div class="task-desc">Dostlarınızı dəvət edin və bonus qazanın.</div>
+        <div class="progress">
+            <div class="progress-bar" id="progress3"></div>
+        </div>
+        <button class="complete-btn" onclick="completeTask(3)">Tamamla</button>
+    </div>
+</div>
+
+<!-- BOTTOM MENU -->
+<div class="bottom-nav">
+    <div>🏠<br>Ev</div>
+    <div class="active">📝<br>Tapşırıqlar</div>
+    <div>📈<br>Liderlər</div>
+    <div>👥<br>Dostlar</div>
+    <div>💲<br>Çıxarış</div>
+</div>
+
+<script>
+// TASK DATA STORAGE
+let tasks = {
+    1: {progress: 0, total: 1},
+    2: {progress: 0, total: 1},
+    3: {progress: 0, total: 1}
+};
+
+function completeTask(id) {
+    const task = tasks[id];
+    if (task.progress < task.total) {
+        task.progress += 1;
+        const percent = (task.progress / task.total) * 100;
+        document.getElementById("progress" + id).style.width = percent + "%";
+        alert("Tapşırıq tamamlandı! Balansınıza əlavə edildi.");
+        saveTasks();
+    } else {
+        alert("Bu tapşırıq artıq tamamlanıb.");
+    }
+}
+
+// LOCAL STORAGE
+function saveTasks() {
+    localStorage.setItem("tasksData", JSON.stringify(tasks));
+}
+
+function loadTasks() {
+    const saved = localStorage.getItem("tasksData");
+    if (saved) {
+        tasks = JSON.parse(saved);
+        for (let id in tasks) {
+            const percent = (tasks[id].progress / tasks[id].total) * 100;
+            document.getElementById("progress" + id).style.width = percent + "%";
+        }
+    }
+}
+
+loadTasks();
+</script>
+
+</body>
+</html>
