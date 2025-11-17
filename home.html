@@ -2,7 +2,7 @@
 <html lang="az">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, user-scalable=no">
 <title>Mobil UI</title>
 
 <style>
@@ -11,6 +11,8 @@
         background: #0f0f0f;
         font-family: Arial, sans-serif;
         color: white;
+        overscroll-behavior: none;
+        touch-action: manipulation;
     }
 
     .container {
@@ -155,7 +157,7 @@
     <!-- BALANCE CARD -->
     <div class="card">
         <div style="color:#888;">Balansınız</div>
-        <div class="balance-big">0.000 ₼</div>
+        <div class="balance-big" id="bal">0.000 ₼</div>
         <div class="sub">≈ $0.000</div>
     </div>
 
@@ -205,30 +207,67 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <script>
-// Telegram məlumatları
+// ============================
+// TELEGRAM USER DATA
+// ============================
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const user = tg.initDataUnsafe.user;
+let userName = "";
+let userTag = "";
 
-if (user) {
-    document.getElementById("userPhoto").src = user.photo_url || "https://via.placeholder.com/150";
-    document.getElementById("userName").textContent = user.first_name + (user.last_name ? " " + user.last_name : "");
-    document.getElementById("userTag").textContent = user.username ? "@" + user.username : "";
+const tgUser = tg.initDataUnsafe.user;
+
+if (tgUser) {
+    userName = tgUser.first_name + (tgUser.last_name ? " " + tgUser.last_name : "");
+    userTag = tgUser.username ? "@" + tgUser.username : "";
+
+    document.getElementById("userPhoto").src = tgUser.photo_url || "https://via.placeholder.com/150";
+    document.getElementById("userName").textContent = userName;
+    document.getElementById("userTag").textContent = userTag;
 }
 
-// ------------------------------
-// BALANS + REKLAM MEXANİZMİ
-// ------------------------------
+
+
+// ============================
+// JSON STORAGE SYSTEM
+// ============================
 let balance = 0.000;
 let watchedAds = 0;
+let totalAds = 50;
 
-const balanceEl = document.querySelector(".balance-big");
-const watchedEl = document.getElementById("watchedCount");
-const progressBar = document.getElementById("progressBar");
-const watchBtn = document.getElementById("watchBtn");
+// JSON-dan oxu
+if (localStorage.getItem("userData")) {
+    const saved = JSON.parse(localStorage.getItem("userData"));
 
-// Reklam SDK-ni dinamik yükləyən funksiya
+    balance = saved.balans;
+    watchedAds = saved.ads;
+
+    document.getElementById("bal").textContent = balance.toFixed(3) + " ₼";
+    document.getElementById("watchedCount").textContent = watchedAds;
+
+    let percent = (watchedAds / totalAds) * 100;
+    document.getElementById("progressBar").style.width = percent + "%";
+}
+
+// JSON-a yazan funksiya
+function saveUserData() {
+    const jsonData = {
+        name: userName,
+        tag: userTag,
+        balans: balance,
+        ads: watchedAds,
+        totalads: totalAds
+    };
+
+    localStorage.setItem("userData", JSON.stringify(jsonData));
+}
+
+
+
+// ============================
+//   SDK REKLAM FUNKSIYASI
+// ============================
 function loadSDK(callback) {
     const script = document.createElement("script");
     script.src = "//libtl.com/sdk.js";
@@ -238,8 +277,18 @@ function loadSDK(callback) {
     document.body.appendChild(script);
 }
 
-// Reklam düyməsi
+
+// ============================
+// İNDİ İZLƏ — REKLAM PROSESI
+// ============================
+const watchBtn = document.getElementById("watchBtn");
+
 watchBtn.addEventListener("click", () => {
+
+    if (watchedAds >= totalAds) {
+        watchBtn.textContent = "Limit bitib";
+        return;
+    }
 
     watchBtn.disabled = true;
     watchBtn.textContent = "Reklam açılır...";
@@ -250,9 +299,8 @@ watchBtn.addEventListener("click", () => {
             show_10198423();
         }
 
-        watchBtn.textContent = "Reklam gedir (10s)";
-
         let timeLeft = 10;
+        watchBtn.textContent = "Reklam gedir (10s)";
 
         const timer = setInterval(() => {
             timeLeft--;
@@ -264,12 +312,13 @@ watchBtn.addEventListener("click", () => {
                 watchedAds += 1;
                 balance += 0.001;
 
-                watchedEl.textContent = watchedAds;
-                balanceEl.textContent = balance.toFixed(3) + " ₼";
+                document.getElementById("watchedCount").textContent = watchedAds;
+                document.getElementById("bal").textContent = balance.toFixed(3) + " ₼";
 
-                // Proqres %
-                let percent = (watchedAds / 50) * 100;
-                progressBar.style.width = percent + "%";
+                let percent = (watchedAds / totalAds) * 100;
+                document.getElementById("progressBar").style.width = percent + "%";
+
+                saveUserData();
 
                 watchBtn.textContent = "▶ İndi izlə";
                 watchBtn.disabled = false;
@@ -277,6 +326,24 @@ watchBtn.addEventListener("click", () => {
         }, 1000);
     });
 });
+
+
+
+// ============================
+//   ANTI ZOOM / ANTI CHEAT
+// ============================
+document.addEventListener("gesturestart", e => e.preventDefault());
+document.addEventListener("gesturechange", e => e.preventDefault());
+document.addEventListener("gestureend", e => e.preventDefault());
+
+document.addEventListener("wheel", function(e) {
+    if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchmove', function (event) {
+    if (event.scale !== 1) event.preventDefault();
+}, { passive: false });
+
 </script>
 
 </body>
