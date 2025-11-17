@@ -14,6 +14,7 @@
 
     .container {
         padding: 15px;
+        padding-bottom: 120px;
     }
 
     .card {
@@ -108,7 +109,6 @@
         margin-top: 10px;
     }
 
-    /* Bottom Menu */
     .bottom-nav {
         position: fixed;
         bottom: 0;
@@ -141,13 +141,12 @@
     <div class="card">
         <div class="row">
             <div class="profile">
-                <img src="https://via.placeholder.com/150" alt="profile">
+                <img id="userPhoto" src="https://via.placeholder.com/150" alt="profile">
                 <div>
-                    <div style="font-size:18px;">Popov</div>
-                    <div style="color:#aaa;">@iPapov</div>
+                    <div id="userName" style="font-size:18px;">Yüklənir...</div>
+                    <div id="userTag" style="color:#aaa;"></div>
                 </div>
             </div>
-
             <div class="lang-btn">AZ</div>
         </div>
     </div>
@@ -169,11 +168,10 @@
             <div class="lang-btn" style="font-size:24px;">📄</div>
         </div>
 
-        <!-- Stats -->
         <div class="adv-grid">
             <div class="adv-box">
                 <div class="num">0</div>
-                <div style="color:#888;">İzlənən reklamalar</div>
+                <div style="color:#888;">İzlənən reklamlar</div>
             </div>
             <div class="adv-box">
                 <div class="num">50</div>
@@ -188,6 +186,7 @@
 
         <button class="watch-btn">▶ İndi izlə</button>
     </div>
+
 </div>
 
 <!-- BOTTOM MENU -->
@@ -198,6 +197,33 @@
     <div>👥<br>Dostlar</div>
     <div>💲<br>Çıxarış</div>
 </div>
+
+<!-- TELEGRAM API -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const user = tg.initDataUnsafe.user;
+
+    if (user) {
+        // Profil şəkli
+        document.getElementById("userPhoto").src =
+            user.photo_url ? user.photo_url : "https://via.placeholder.com/150";
+
+        // Ad
+        document.getElementById("userName").textContent =
+            user.first_name + (user.last_name ? " " + user.last_name : "");
+
+        // Username
+        document.getElementById("userTag").textContent =
+            user.username ? "@" + user.username : "";
+    } else {
+        document.getElementById("userName").textContent = "Qonaq";
+        document.getElementById("userTag").textContent = "";
+    }
+</script>
 
 </body>
 </html>
