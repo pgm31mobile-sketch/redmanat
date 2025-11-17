@@ -4,29 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tapşırıqlar</title>
+
 <style>
 body { margin:0; background:#0c0c0c; font-family:Arial,sans-serif; color:white; }
 .container { padding:15px; padding-bottom:130px; }
+
 .balance-card { background:#141414; padding:22px; border-radius:22px; margin-bottom:20px; }
 .balance-label { color:#9a9a9a; font-size:15px; margin-bottom:5px; }
 .balance-value { font-size:36px; font-weight:bold; }
+
 .section-card { background:#141414; padding:22px; border-radius:22px; margin-bottom:22px; text-align:center; }
 .section-title { font-size:27px; font-weight:bold; }
 .section-desc { color:#b5b5b5; margin-top:8px; font-size:15px; }
 .completed-btn { margin-top:15px; background:#e42020; padding:14px; width:100%; border-radius:14px; font-size:17px; font-weight:bold; border:none; color:white; cursor:pointer; }
+
 .task-item { background:#141414; padding:20px; border-radius:22px; margin-bottom:18px; border:2px solid #333; position:relative; }
 .task-top { display:flex; align-items:center; gap:15px; }
 .task-icon { width:48px; height:48px; border-radius:14px; }
 .task-title { font-size:20px; font-weight:bold; }
 .task-desc { color:#b8b8b8; margin-left:63px; margin-top:3px; }
 .reward-tag { background:#ff2626; padding:6px 12px; border-radius:10px; display:inline-block; margin-left:63px; margin-top:10px; font-weight:bold; }
+
 .start-btn { position:absolute; right:20px; top:50%; transform:translateY(-50%); background:#e42020; padding:12px 22px; border-radius:14px; font-size:17px; border:none; color:white; font-weight:bold; cursor:pointer; }
+
 .bottom-nav { position:fixed; bottom:0; left:0; width:100%; background:#111; padding:10px 0 8px; display:flex; justify-content:space-around; border-top:1px solid #333; }
 .nav-item { text-align:center; font-size:13px; color:#bbb; }
 .active { color:#ff3a3a !important; font-weight:bold; }
 </style>
 </head>
 <body>
+
 <div class="container">
 
 <!-- BALANS -->
@@ -63,49 +70,76 @@ body { margin:0; background:#0c0c0c; font-family:Arial,sans-serif; color:white; 
 <!-- NAVIGATION -->
 <div class="bottom-nav">
     <div onclick="window.location.href='home.html'">🏠<br>Ev</div>
-    <div class="active" onclick="window.location.href='tasks.html'">📝🚀<br>Tapşırıqlar</div>
+    <div class="active" onclick="window.location.href='tasks.html'">📝<br>Tapşırıqlar</div>
     <div onclick="window.location.href='leaders.html'">📈<br>Liderlər</div>
     <div onclick="window.location.href='friends.html'">👥<br>Dostlar</div>
     <div onclick="window.location.href='withdraw.html'">💲<br>Çıxarış</div>
 </div>
 
 <script>
-// Balansı yüklə (home.html ilə eyni LocalStorage)
-let balance = parseFloat(localStorage.getItem("userBalance")) || 0;
-document.getElementById("bal").textContent = balance.toFixed(3) + " ₼";
+/* ===========================================
+   USERDATA JSON OXUMA / YARATMA
+=========================================== */
+let userData = JSON.parse(localStorage.getItem("userData"));
 
-// Task status JSON
-let tasksStatus = JSON.parse(localStorage.getItem("tasksStatus")) || {};
+if (!userData) {
+    userData = {
+        name: "",
+        tag: "",
+        balans: 0,
+        ads: 0,
+        totalads: 50,
+        tasks: {}
+    };
+}
 
-// Dinamik task idarəsi
+// Balansı göstər
+document.getElementById("bal").textContent = userData.balans.toFixed(3) + " ₼";
+
+/* ===========================================
+   TASK FUNKSIYALARI
+=========================================== */
 document.querySelectorAll(".task-item").forEach(task => {
+
     const taskId = task.dataset.taskId;
     const reward = parseFloat(task.dataset.reward);
     const btn = task.querySelector(".start-btn");
 
+    // Tapşırığı tamamla
     function completeTask() {
-        if(tasksStatus[taskId]) return;
-        balance += reward;
-        document.getElementById("bal").textContent = balance.toFixed(3) + " ₼";
-        tasksStatus[taskId] = true;
-        localStorage.setItem("tasksStatus", JSON.stringify(tasksStatus));
-        localStorage.setItem("userBalance", balance);
+        if (userData.tasks[taskId]) return; // Artıq tamamlanıb
+
+        userData.balans += reward;
+        userData.tasks[taskId] = true;
+
+        localStorage.setItem("userData", JSON.stringify(userData));
+
+        // UI yenilə
+        document.getElementById("bal").textContent = userData.balans.toFixed(3) + " ₼";
+
         btn.textContent = "Tamamlandı";
         btn.disabled = true;
-        btn.style.background = "#0f0"; // yaşıl düymə
+        btn.style.background = "#0f0";
         task.style.border = "2px solid #0f0";
     }
 
-    // Əvvəlcədən tamamlanmış task
-    if(tasksStatus[taskId]) completeTask();
+    // Əvvəlcədən tamamlanıbsa
+    if (userData.tasks[taskId]) {
+        btn.textContent = "Tamamlandı";
+        btn.disabled = true;
+        btn.style.background = "#0f0";
+        task.style.border = "2px solid #0f0";
+    }
 
-    btn.onclick = function() {
-        if(tasksStatus[taskId]) return;
-        // Telegram linki açılır
+    // Başla düyməsi klik
+    btn.onclick = function () {
+        if (userData.tasks[taskId]) return;
+
         window.open("https://t.me/ads_reklam69", "_blank");
-        completeTask(); // dərhal tamamlandı
+        completeTask();
     };
 });
 </script>
+
 </body>
 </html>
