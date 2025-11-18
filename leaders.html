@@ -69,13 +69,10 @@ navItems.forEach(item => {
     if (href === currentPage) item.classList.add("active");
 });
 
-// Bütün demo və bot istifadəçiləri LocalStorage-dan sil
-localStorage.removeItem("users");
-
-// İstifadəçilər LocalStorage-dan götürülür
+// LocalStorage-dan istifadəçiləri götür
 let users = JSON.parse(localStorage.getItem("users")) || [];
 
-// Balansı "m" və "k" ilə olan string-dən rəqəmə çevirən funksiya
+// Balansı "m" və "k" ilə olan string-dən rəqəmə çevir
 function parseScore(scoreStr) {
     if (!scoreStr) return 0;
     scoreStr = scoreStr.toLowerCase().replace(/,/g, "");
@@ -84,7 +81,7 @@ function parseScore(scoreStr) {
     return parseFloat(scoreStr);
 }
 
-// İstifadəçiləri balansa görə sırala
+// Balansa görə sırala
 users.sort((a, b) => parseScore(b.score) - parseScore(a.score));
 
 const leaderboard = document.getElementById("leaderboard");
