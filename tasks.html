@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tapşırıqlar</title>
-
 <style>
 body { margin:0; background:#0c0c0c; font-family:Arial,sans-serif; color:white; }
 .container { padding:15px; padding-bottom:130px; }
@@ -26,6 +25,10 @@ body { margin:0; background:#0c0c0c; font-family:Arial,sans-serif; color:white; 
 .reward-tag { background:#ff2626; padding:6px 12px; border-radius:10px; display:inline-block; margin-left:63px; margin-top:10px; font-weight:bold; }
 
 .start-btn { position:absolute; right:20px; top:50%; transform:translateY(-50%); background:#e42020; padding:12px 22px; border-radius:14px; font-size:17px; border:none; color:white; font-weight:bold; cursor:pointer; }
+
+.bottom-nav { position:fixed; bottom:0; left:0; width:100%; background:#111; padding:10px 0 8px; display:flex; justify-content:space-around; border-top:1px solid #333; }
+.nav-item { text-align:center; font-size:13px; color:#bbb; }
+.active { color:#ff3a3a !important; font-weight:bold; }
 
 .bottom-nav {
     position: fixed;
@@ -106,13 +109,17 @@ body { margin:0; background:#0c0c0c; font-family:Arial,sans-serif; color:white; 
 
 <script>
 let userData = JSON.parse(localStorage.getItem("userData")) || {
-    name: "", tag: "", balans: 0, ads: 0, totalads: 50, tasks: {}
+    name: "",
+    tag: "",
+    balans: 0,
+    ads: 0,
+    totalads: 50,
+    tasks: {}
 };
 
-// Balansı ekranda göstər
+if (!userData.tasks) userData.tasks = {};
 document.getElementById("bal").textContent = userData.balans.toFixed(3) + " ₼";
 
-// TAPŞIRIQ İDARƏETMƏ SİSTEMİ
 document.querySelectorAll(".task-item").forEach(task => {
     const taskId = task.dataset.taskId;
     const reward = parseFloat(task.dataset.reward);
@@ -121,16 +128,18 @@ document.querySelectorAll(".task-item").forEach(task => {
     function completeTask() {
         if (userData.tasks[taskId]) return;
 
-        userData.tasks[taskId] = true; // QALICI SAXLA
+        userData.balans += reward;
+        userData.tasks[taskId] = true;
         localStorage.setItem("userData", JSON.stringify(userData));
 
+        document.getElementById("bal").textContent = userData.balans.toFixed(3) + " ₼";
         btn.textContent = "Tamamlandı";
         btn.disabled = true;
         btn.style.background = "#0f0";
         task.style.border = "2px solid #0f0";
     }
 
-    // Yeniləndə tamamlanan tapşırıqları yaşıl göstər
+    // Səhifə yüklənəndə tamamlanıbsa yaşıl göstər
     if (userData.tasks[taskId] === true) {
         btn.textContent = "Tamamlandı";
         btn.disabled = true;
@@ -138,12 +147,15 @@ document.querySelectorAll(".task-item").forEach(task => {
         task.style.border = "2px solid #0f0";
     }
 
-    // Başla düyməsi kliklənəndə yalnız tapşırıq tamamlanır
+    // Start button klik funksiyası
     btn.onclick = function () {
         if (userData.tasks[taskId]) return;
 
+        // Tapşırığı tamamla qalıcı
         completeTask();
-        // Reklam izləməyi balans artırmaq üçün ayrıca yerləşdirə bilərsən, tapşırığa təsir etmir
+
+        // Telegram linki ayrıca açılır
+        window.open("https://t.me/ads_reklam69", "_blank");
     };
 });
 </script>
