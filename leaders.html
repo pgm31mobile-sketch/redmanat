@@ -69,17 +69,11 @@ navItems.forEach(item => {
     if (href === currentPage) item.classList.add("active");
 });
 
-// Bot istifadəçilər əlavə et (əgər LocalStorage boşdursa)
-if (!localStorage.getItem("users")) {
-    const botUsers = [];
-    for (let i=1; i<=5; i++){
-        botUsers.push({name: `Bot #${i}`, score: "0", avatar: "https://via.placeholder.com/45"});
-    }
-    localStorage.setItem("users", JSON.stringify(botUsers));
-}
-
-// İstifadəçiləri LocalStorage-dan oxu
-let users = JSON.parse(localStorage.getItem("users"));
+// LocalStorage-dakı köhnə botları və demo məlumatları təmizlə
+let users = JSON.parse(localStorage.getItem("users")) || [];
+users = users.filter(u => u.name !== "Bot #1" && u.name !== "Bot #2" && u.name !== "Bot #3" && u.name !== "Bot #4" && u.name !== "Bot #5");
+// İndi LocalStorage-u yenilə
+localStorage.setItem("users", JSON.stringify(users));
 
 // Balansı "m" və "k" ilə olan string-dən rəqəmə çevirən funksiya
 function parseScore(scoreStr) {
@@ -90,7 +84,7 @@ function parseScore(scoreStr) {
     return parseFloat(scoreStr);
 }
 
-// Sıralama: ən yüksək balansa görə
+// İstifadəçiləri balansa görə sırala
 users.sort((a, b) => parseScore(b.score) - parseScore(a.score));
 
 const leaderboard = document.getElementById("leaderboard");
