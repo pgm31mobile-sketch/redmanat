@@ -2,24 +2,31 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
     <title>Liderlər</title>
 
     <style>
         body {
             margin: 0;
-            background: #0e0e0e;
-            font-family: Inter, Arial, sans-serif;
+            background: #0f0f0f;
+            font-family: Arial, sans-serif;
             color: white;
+            overscroll-behavior: none;
+            touch-action: manipulation;
         }
 
+        .container {
+            padding: 15px;
+            padding-bottom: 120px;
+        }
+
+        /* HEADER */
         .header-box {
-            width: 90%;
-            margin: 20px auto;
-            background: #181818;
-            border-radius: 18px;
+            background: #1a1a1a;
+            border-radius: 20px;
             padding: 25px;
             text-align: center;
+            margin-bottom: 20px;
         }
 
         .header-title {
@@ -34,7 +41,7 @@
         }
 
         .user-count {
-            background: #d32020;
+            background: #ff2e2e;
             display: inline-block;
             padding: 10px 20px;
             border-radius: 50px;
@@ -42,11 +49,11 @@
             font-weight: 600;
         }
 
+        /* TABS */
         .tabs {
             display: flex;
             gap: 12px;
-            width: 90%;
-            margin: 20px auto;
+            margin-bottom: 20px;
         }
 
         .tab {
@@ -58,19 +65,17 @@
             font-size: 15px;
             background: #181818;
             border: 1px solid #333;
-            cursor: pointer;
         }
 
         .tab.active {
-            background: #d32020;
+            background: #ff2e2e;
             border: none;
         }
 
+        /* LEADERBOARD */
         .leaderboard {
-            width: 90%;
-            margin: 10px auto 40px;
-            background: #181818;
-            border-radius: 16px;
+            background: #1a1a1a;
+            border-radius: 20px;
             padding: 20px;
         }
 
@@ -95,7 +100,7 @@
         .rank.yellow { color: #ffd700; }
         .rank.gray { color: #c9c9c9; }
         .rank.bronze { color: #e2862b; }
-        .rank.red { color: #ff3b3b; }
+        .rank.red { color: #ff3d3d; }
 
         .avatar {
             width: 45px;
@@ -118,13 +123,49 @@
         }
 
         .score {
-            color: #ff3b3b;
+            color: #ff3d3d;
             font-weight: 700;
+        }
+
+        /* BOTTOM NAV (home.html-dən 1:1 götürülüb) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: space-evenly;
+            padding: 14px 0;
+            border-top: 1px solid #333;
+            box-sizing: border-box;
+            z-index: 999;
+            gap: 2px;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            font-size: 14px;
+            color: #bbb;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .nav-item.active {
+            color: #ff3d3d;
+            font-weight: bold;
+        }
+
+        .nav-item br {
+            line-height: 1.1;
         }
     </style>
 </head>
 
 <body>
+
+<div class="container">
 
     <div class="header-box">
         <div class="header-title">Liderlər</div>
@@ -139,7 +180,6 @@
 
     <div class="leaderboard">
 
-        <!-- 1 -->
         <div class="user-row">
             <div class="rank yellow">#1</div>
             <div class="avatar"><img src="img/1.jpg"></div>
@@ -147,7 +187,6 @@
             <div class="score">2.571m</div>
         </div>
 
-        <!-- 2 -->
         <div class="user-row">
             <div class="rank gray">#2</div>
             <div class="avatar"><img src="img/2.jpg"></div>
@@ -155,7 +194,6 @@
             <div class="score">2.545m</div>
         </div>
 
-        <!-- 3 -->
         <div class="user-row">
             <div class="rank bronze">#3</div>
             <div class="avatar"><img src="img/3.jpg"></div>
@@ -163,15 +201,13 @@
             <div class="score">2.424m</div>
         </div>
 
-        <!-- 4 -->
         <div class="user-row">
             <div class="rank red">#4</div>
             <div class="avatar"><img src="img/4.jpg"></div>
-            <div class="username">İbrahim Memmedli</div>
+            <div class="username">İbrahim Məmmədli</div>
             <div class="score">2.234m</div>
         </div>
 
-        <!-- 5 -->
         <div class="user-row">
             <div class="rank red">#5</div>
             <div class="avatar"><img src="img/5.jpg"></div>
@@ -181,7 +217,9 @@
 
     </div>
 
-    <!-- BOTTOM MENU -->
+</div>
+
+<!-- BOTTOM NAV -->
 <div class="bottom-nav">
     <div class="nav-item" onclick="window.location.href='home.html'">🏠<br>Ev</div>
     <div class="nav-item" onclick="window.location.href='tasks.html'">📝<br>Tapşırıqlar</div>
@@ -189,6 +227,20 @@
     <div class="nav-item" onclick="window.location.href='friends.html'">👥<br>Dostlar</div>
     <div class="nav-item" onclick="window.location.href='withdraw.html'">💲<br>Çıxarış</div>
 </div>
+
+<script>
+/* Alt menyuda aktiv düyməni seçir */
+const navItems = document.querySelectorAll(".nav-item");
+const currentPage = window.location.pathname.split("/").pop();
+
+navItems.forEach(item => {
+    const onclickAttr = item.getAttribute("onclick");
+    if (!onclickAttr) return;
+    const href = onclickAttr.match(/'(.+?)'/)[1];
+
+    if (href === currentPage) item.classList.add("active");
+});
+</script>
 
 </body>
 </html>
