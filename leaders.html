@@ -46,7 +46,7 @@ body { margin:0; background:#0f0f0f; font-family:Arial,sans-serif; color:white; 
     </div>
 
     <div class="leaderboard" id="leaderboard">
-        <!-- İstifadəçilər buraya əlavə olunacaq -->
+        <!-- TOP 5 istifadəçi buraya əlavə olunacaq -->
     </div>
 </div>
 
@@ -72,7 +72,7 @@ navItems.forEach(item => {
 // LocalStorage-dan istifadəçiləri götür
 let users = JSON.parse(localStorage.getItem("users")) || [];
 
-// Balansı "m" və "k" ilə olan string-dən rəqəmə çevir
+// Balansı "m" və "k" formatından rəqəmə çevir
 function parseScore(scoreStr) {
     if (!scoreStr) return 0;
     scoreStr = scoreStr.toLowerCase().replace(/,/g, "");
@@ -84,12 +84,15 @@ function parseScore(scoreStr) {
 // Balansa görə sırala
 users.sort((a, b) => parseScore(b.score) - parseScore(a.score));
 
+// Yalnız **TOP 5** istifadəçi
+let topUsers = users.slice(0, 5);
+
 const leaderboard = document.getElementById("leaderboard");
 document.getElementById("userCount").textContent = `Ümumi istifadəçilər: ${users.length}`;
 leaderboard.innerHTML = "";
 
-// Leaderboard-a əlavə et
-users.forEach((user, index)=>{
+// TOP 5 istifadəçini göstər
+topUsers.forEach((user, index)=>{
     const userRow = document.createElement("div");
     userRow.classList.add("user-row");
 
