@@ -5,12 +5,13 @@ const cors = require('cors');
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(express.static(__dirname)); // admin.html üçün
+app.use(express.static(__dirname));
 
 mongoose.connect('mongodb://127.0.0.1:27017/botdb', {
     useNewUrlParser: true,
     useUnifiedTopology: true
-});
+}).then(() => console.log("MongoDB qoşuldu"))
+  .catch(err => console.log("MongoDB xətası:", err));
 
 const userSchema = new mongoose.Schema({
     id: Number,
@@ -20,19 +21,16 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Bütün istifadəçilər
 app.get('/api/users', async (req, res) => {
     const users = await User.find();
     res.json(users);
 });
 
-// Ümumi istifadəçi sayı
 app.get('/api/users/count', async (req, res) => {
     const count = await User.countDocuments();
     res.json({ count });
 });
 
-// Yeni istifadəçi əlavə et
 app.post('/api/users', async (req, res) => {
     const { id, name } = req.body;
     let user = await User.findOne({ id });
@@ -43,10 +41,8 @@ app.post('/api/users', async (req, res) => {
     res.json({ success: true });
 });
 
-// Reklam izlənməsi və sıfırlama
 app.post('/api/users/:id/ad', async (req, res) => {
     const user = await User.findOne({ id: req.params.id });
-
     if (user) {
         if (req.body.reset) {
             user.ads = 0;
