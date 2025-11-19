@@ -20,31 +20,19 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// API: bütün istifadəçilər
+// Bütün istifadəçilər
 app.get('/api/users', async (req, res) => {
     const users = await User.find();
     res.json(users);
 });
 
-// API: ümumi istifadəçi sayı
+// Ümumi istifadəçi sayı
 app.get('/api/users/count', async (req, res) => {
     const count = await User.countDocuments();
     res.json({ count });
 });
 
-// API: reklam izlənməsi üçün
-app.post('/api/users/:id/ad', async (req, res) => {
-    const user = await User.findOne({ id: req.params.id });
-    if (user) {
-        user.ads += 1;
-        await user.save();
-        res.json({ success: true });
-    } else {
-        res.json({ success: false });
-    }
-});
-
-// API: istifadəçi əlavə
+// Yeni istifadəçi əlavə et
 app.post('/api/users', async (req, res) => {
     const { id, name } = req.body;
     let user = await User.findOne({ id });
@@ -53,6 +41,23 @@ app.post('/api/users', async (req, res) => {
         await user.save();
     }
     res.json({ success: true });
+});
+
+// Reklam izlənməsi və sıfırlama
+app.post('/api/users/:id/ad', async (req, res) => {
+    const user = await User.findOne({ id: req.params.id });
+
+    if (user) {
+        if (req.body.reset) {
+            user.ads = 0;
+        } else {
+            user.ads += 1;
+        }
+        await user.save();
+        res.json({ success: true });
+    } else {
+        res.json({ success: false });
+    }
 });
 
 app.listen(3000, () => console.log('Server 3000-də işləyir'));
