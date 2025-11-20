@@ -5,25 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mobil UI</title>
 <style>
-    body {margin:0; background:#0f0f0f; font-family:Arial,sans-serif; color:white; overscroll-behavior:none; touch-action:manipulation;}
-    .container {padding:15px; padding-bottom:120px;}
-    .card {background:#1a1a1a; border-radius:20px; padding:18px; margin-bottom:18px;}
-    .row {display:flex; justify-content:space-between; align-items:center;}
-    .profile {display:flex; align-items:center; gap:5px;}
-    .profile img {width:55px; height:55px; border-radius:50%; border:3px solid #ff2e2e; object-fit:cover;}
-    .lang-btn {background:#ff2e2e; padding:10px 16px; border-radius:12px; font-weight:bold;}
-    .balance-big {font-size:28px; font-weight:bold; margin-top:6px;}
-    .sub {color:#ff6a6a; margin-top:-5px;}
-    .adv-grid {display:flex; justify-content:space-between; margin:20px 0;}
-    .adv-box {width:48%; background:#1f1f1f; padding:18px; border-radius:20px; text-align:center;}
-    .adv-box .num {font-size:28px; font-weight:bold; color:#ff3d3d;}
-    .progress {width:100%; height:8px; background:#333; border-radius:10px; margin:10px 0;}
-    .progress-bar {width:0%; height:100%; background:#ff2e2e; border-radius:10px;}
-    .watch-btn {width:100%; padding:15px; border:none; border-radius:14px; background:#ff2e2e; color:white; font-size:18px; font-weight:bold; margin-top:10px; cursor:pointer;}
-    .bottom-nav {position:fixed; bottom:0; left:0; width:100%; background:#1a1a1a; display:flex; justify-content:space-evenly; padding:14px 0; border-top:1px solid #333; box-sizing:border-box; z-index:999; gap:2px;}
-    .nav-item {flex:1; text-align:center; font-size:14px; color:#bbb; cursor:pointer; padding:8px 0;}
-    .nav-item.active {color:#ff3d3d; font-weight:bold;}
-    .nav-item br {line-height:1.1;}
+body {margin:0; background:#0f0f0f; font-family:Arial,sans-serif; color:white; overscroll-behavior:none; touch-action:manipulation;}
+.container {padding:15px; padding-bottom:120px;}
+.card {background:#1a1a1a; border-radius:20px; padding:18px; margin-bottom:18px;}
+.row {display:flex; justify-content:space-between; align-items:center;}
+.profile {display:flex; align-items:center; gap:5px;}
+.profile img {width:55px; height:55px; border-radius:50%; border:3px solid #ff2e2e; object-fit:cover;}
+.lang-btn {background:#ff2e2e; padding:10px 16px; border-radius:12px; font-weight:bold;}
+.balance-big {font-size:28px; font-weight:bold; margin-top:6px;}
+.sub {color:#ff6a6a; margin-top:-5px;}
+.adv-grid {display:flex; justify-content:space-between; margin:20px 0;}
+.adv-box {width:48%; background:#1f1f1f; padding:18px; border-radius:20px; text-align:center;}
+.adv-box .num {font-size:28px; font-weight:bold; color:#ff3d3d;}
+.progress {width:100%; height:8px; background:#333; border-radius:10px; margin:10px 0;}
+.progress-bar {width:0%; height:100%; background:#ff2e2e; border-radius:10px;}
+.watch-btn {width:100%; padding:15px; border:none; border-radius:14px; background:#ff2e2e; color:white; font-size:18px; font-weight:bold; margin-top:10px; cursor:pointer;}
+.bottom-nav {position:fixed; bottom:0; left:0; width:100%; background:#1a1a1a; display:flex; justify-content:space-evenly; padding:14px 0; border-top:1px solid #333; box-sizing:border-box; z-index:999; gap:2px;}
+.nav-item {flex:1; text-align:center; font-size:14px; color:#bbb; cursor:pointer; padding:8px 0;}
+.nav-item.active {color:#ff3d3d; font-weight:bold;}
+.nav-item br {line-height:1.1;}
 </style>
 </head>
 <body>
@@ -94,7 +94,7 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-let userName = "", userTag = "";
+let userName="", userTag="";
 const tgUser = tg.initDataUnsafe.user;
 if(tgUser){
     userName = tgUser.first_name + (tgUser.last_name ? " " + tgUser.last_name : "");
@@ -104,18 +104,18 @@ if(tgUser){
     document.getElementById("userTag").textContent = userTag;
 }
 
-let balance = 0.000, watchedAds = 0, totalAds = 50;
+let balance=0.000, watchedAds=0, totalAds=50;
 if(localStorage.getItem("userData")){
-    const saved = JSON.parse(localStorage.getItem("userData"));
-    balance = saved.balans || 0;
-    watchedAds = saved.ads || 0;
-    document.getElementById("bal").textContent = balance.toFixed(3) + " ₼";
-    document.getElementById("watchedCount").textContent = watchedAds;
-    document.getElementById("progressBar").style.width = (watchedAds/totalAds*100)+"%";
+    const saved=JSON.parse(localStorage.getItem("userData"));
+    balance=saved.balans||0;
+    watchedAds=saved.ads||0;
+    document.getElementById("bal").textContent=balance.toFixed(3)+" ₼";
+    document.getElementById("watchedCount").textContent=watchedAds;
+    document.getElementById("progressBar").style.width=(watchedAds/totalAds*100)+"%";
 }
 
 function saveUserData(){
-    const jsonData = { name:userName, tag:userTag, balans:balance, ads:watchedAds, totalads:totalAds };
+    const jsonData={name:userName, tag:userTag, balans:balance, ads:watchedAds, totalads:totalAds};
     localStorage.setItem("userData", JSON.stringify(jsonData));
 }
 
@@ -142,7 +142,7 @@ watchBtn.addEventListener("click",()=>{
             watchBtn.textContent=`Reklam gedir (${timeLeft}s)`;
             if(timeLeft<=0){
                 clearInterval(timer);
-                watchedAds+=1;
+                watchedAds++;
                 balance+=0.001;
                 document.getElementById("watchedCount").textContent=watchedAds;
                 document.getElementById("bal").textContent=balance.toFixed(3)+" ₼";
@@ -155,8 +155,8 @@ watchBtn.addEventListener("click",()=>{
     });
 });
 
-// 🔥 Admin tərəfindən reklam sıfırlanmasını aşkar et
-window.addEventListener("focus",()=>{
+// 🔥 Admin reset yoxlaması (səhifə yüklənəndə və pəncərə focus olduqda)
+function checkAdminReset(){
     if(localStorage.getItem("resetAds")==="1"){
         watchedAds=0;
         document.getElementById("watchedCount").textContent=0;
@@ -164,14 +164,16 @@ window.addEventListener("focus",()=>{
         saveUserData();
         localStorage.removeItem("resetAds");
     }
-});
+}
+checkAdminReset();
+window.addEventListener("focus", checkAdminReset);
 
-// Anti-zoom
+// Anti zoom
 document.addEventListener("gesturestart", e=>e.preventDefault());
 document.addEventListener("gesturechange", e=>e.preventDefault());
 document.addEventListener("gestureend", e=>e.preventDefault());
 document.addEventListener("wheel", e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
-document.addEventListener('touchmove', e=>{if(e.scale!==1)e.preventDefault();},{passive:false});
+document.addEventListener("touchmove", e=>{if(e.scale!==1)e.preventDefault();},{passive:false});
 
 // Bottom nav aktiv düymə
 const navItems=document.querySelectorAll(".nav-item");
@@ -184,6 +186,5 @@ navItems.forEach(item=>{
     else item.classList.remove("active");
 });
 </script>
-
 </body>
 </html>
