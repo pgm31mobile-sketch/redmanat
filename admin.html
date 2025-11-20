@@ -4,78 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Panel</title>
-
 <style>
     body {
-        background: #0f0f0f;
         margin: 0;
         font-family: Arial, sans-serif;
+        background: #0f0f0f;
         color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
         text-align: center;
-        padding-top: 80px;
     }
-
-    .card {
-        background: #1a1a1a;
-        padding: 25px;
-        margin: auto;
-        width: 85%;
-        border-radius: 20px;
-        box-shadow: 0 0 10px #000;
-    }
-
-    .btn-restart {
-        background: #ffc400;
-        color: #000;
-        padding: 15px 25px;
-        font-size: 20px;
+    #resetBtn {
+        padding: 15px 30px;
+        font-size: 18px;
         font-weight: bold;
+        background-color: #FFD700; /* sarı */
+        color: #000;
         border: none;
-        border-radius: 14px;
+        border-radius: 10px;
         cursor: pointer;
-        width: 100%;
-        margin-top: 20px;
     }
-
-    .btn-restart:active {
-        background: #ffdd4d;
-    }
-
-    .info {
-        color: #bbb;
-        margin-top: 15px;
-        font-size: 14px;
+    #resetBtn:hover {
+        background-color: #FFC300;
     }
 </style>
 </head>
 <body>
-
-<div class="card">
-    <h2>Admin Panel</h2>
-    <p>Bu düyməyə basdıqda <b>home.html</b> üçün reklam limiti sıfırlanır.</p>
-
-    <button class="btn-restart" onclick="resetAds()">🔄 REKLAMLARI SIFIRLA</button>
-
-    <div class="info">Yalnız admin istifadə etməlidir.</div>
+<div class="container">
+    <h1>Admin Panel</h1>
+    <button id="resetBtn">Restart Reklamlar</button>
 </div>
 
 <script>
-function resetAds() {
-    // Mövcud userData-nı yüklə
-    let data = localStorage.getItem("userData");
+document.getElementById("resetBtn").addEventListener("click", () => {
+    // userData varsa ads-i sıfırla
+    let userData = JSON.parse(localStorage.getItem("userData"));
+    if (!userData) userData = {};
+    userData.ads = 0;
+    localStorage.setItem("userData", JSON.stringify(userData));
 
-    if (data) {
-        data = JSON.parse(data);
-        data.ads = 0; // reklamları sıfırla
-        localStorage.setItem("userData", JSON.stringify(data));
-    }
+    // Home.html dərhal bunu aşkar edə bilsin deyə flag əlavə et
+    localStorage.setItem("resetAds", "1");
 
-    // lastReset yenilə ki home.html yenidən hesablaya bilsin
-    localStorage.setItem("lastReset", Date.now());
-
-    alert("Reklamlar uğurla sıfırlandı!");
-}
+    alert("Reklamlar sıfırlandı!");
+});
 </script>
-
 </body>
 </html>
