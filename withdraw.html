@@ -150,8 +150,8 @@
     <!-- Mövcud balans -->
     <div class="card">
         <div class="sub">Mövcud balans</div>
-        <div class="balance">0.021 ₼</div>
-        <div class="sub">≈ $0.012</div>
+        <div class="balance" id="balanceValue">0.000 ₼</div>
+        <div class="sub">≈ $0.000</div>
     </div>
 
     <!-- Çıxarış məbləği -->
@@ -193,6 +193,18 @@
     <div class="nav-item" onclick="window.location.href='tasks.html'">📝<br>Tapşırıqlar</div>
     <div class="nav-item active" onclick="window.location.href='withdraw.html'">💲<br>Çıxarış</div>
 </div>
+
+<!-- LOCAL STORAGE BALANS -->
+<script>
+let balance = 0;
+
+if (localStorage.getItem("userData")) {
+    const saved = JSON.parse(localStorage.getItem("userData"));
+    balance = saved.balans ?? 0;
+}
+
+document.getElementById("balanceValue").textContent = balance.toFixed(3) + " ₼";
+</script>
 
 </body>
 </html>
