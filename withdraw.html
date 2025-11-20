@@ -36,7 +36,6 @@
         font-size:14px;
     }
 
-    /* INPUT BOX */
     .input-box{
         margin-top:12px;
         background:#111;
@@ -55,7 +54,6 @@
         color:white;
     }
 
-    /* PAYMENT METHODS */
     .method-grid{
         display:grid;
         grid-template-columns: repeat(2, 1fr);
@@ -73,8 +71,8 @@
         border:2px solid transparent;
     }
 
-    .method:hover{
-        border-color:#444;
+    .method.selected{
+        border-color:#0f0;
     }
 
     .emoji{
@@ -115,7 +113,10 @@
         box-shadow:0 0 10px rgba(0,0,0,0.4);
     }
 
-    /* BOTTOM NAV */
+    .dynamic-input-box{
+        margin-top:15px;
+    }
+
     .bottom-nav {
         position: fixed;
         bottom: 0;
@@ -143,7 +144,6 @@
         color: #ff3d3d;
         font-weight: bold;
     }
-
 </style>
 </head>
 <body>
@@ -153,7 +153,7 @@
     <!-- Balans -->
     <div class="card">
         <div class="sub">Mövcud balans</div>
-        <div class="balance" id="balanceValue">0.000 ₼</div>
+        <div class="balance" id="balanceValue">10.000 ₼</div>
         <div class="sub">≈ $0.000</div>
     </div>
 
@@ -168,17 +168,11 @@
         <div style="margin-top:18px; font-weight:bold;">Ödəniş üsulunu seçin</div>
 
         <div class="method-grid">
-
-            <div class="method"><span class="emoji">🔟</span>M10</div>
-
-            <div class="method"><span class="emoji">🏦</span>Bank</div>
-
-            <div class="method"><span class="emoji">📱</span>Nar</div>
-
-            <div class="method"><span class="emoji">📶</span>Bakcell</div>
-
-            <div class="method"><span class="emoji">📡</span>Azercell</div>
-
+            <div class="method" data-type="phone"><span class="emoji">🔟</span>M10</div>
+            <div class="method" data-type="bank"><span class="emoji">🏦</span>Bank</div>
+            <div class="method" data-type="phone"><span class="emoji">📱</span>Nar</div>
+            <div class="method" data-type="phone"><span class="emoji">📶</span>Bakcell</div>
+            <div class="method" data-type="phone"><span class="emoji">📡</span>Azercell</div>
         </div>
 
         <div class="green-box">
@@ -186,14 +180,15 @@
             Emal müddəti: <span class="bold">24 saat ərzində</span>
         </div>
 
-        <div class="btn">Sorğu göndər</div>
+        <div class="dynamic-input-box" id="dynamicInputContainer"></div>
 
+        <div class="btn" id="sendBtn">Sorğu göndər</div>
     </div>
 
     <!-- Tarixçə -->
     <div class="history-card">
         <div style="font-weight:bold; font-size:20px;">Çıxarış tarixçəsi</div>
-        <div style="opacity:0.6; margin-top:10px;">Çıxarış tarixçəsi yoxdur</div>
+        <div id="historyList" style="opacity:0.6; margin-top:10px;">Çıxarış tarixçəsi yoxdur</div>
     </div>
 
 </div>
@@ -205,16 +200,85 @@
     <div class="nav-item active" onclick="window.location.href='withdraw.html'">💲<br>Çıxarış</div>
 </div>
 
-<!-- LocalStorage Balans Script -->
 <script>
-let balance = 0;
+let balance = 10; // test üçün default balans
+let selectedMethod = null;
 
-if (localStorage.getItem("userData")) {
-    const saved = JSON.parse(localStorage.getItem("userData"));
-    balance = saved.balans ?? 0;
-}
+const methods = document.querySelectorAll(".method");
+const dynamicContainer = document.getElementById("dynamicInputContainer");
+const withdrawInput = document.getElementById("withdrawAmount");
+const historyList = document.getElementById("historyList");
+const sendBtn = document.getElementById("sendBtn");
 
-document.getElementById("balanceValue").textContent = balance.toFixed(3) + " ₼";
+methods.forEach(method => {
+    method.addEventListener("click", () => {
+        // remove previous selection
+        methods.forEach(m => m.classList.remove("selected"));
+        method.classList.add("selected");
+        selectedMethod = method;
+
+        // create dynamic input
+        dynamicContainer.innerHTML = "";
+        const inputBox = document.createElement("div");
+        inputBox.classList.add("input-box");
+        const inputField = document.createElement("input");
+        inputField.type = "number";
+        inputField.classList.add("input-real");
+        inputField.placeholder = (method.dataset.type === "phone") ? "Nömrə daxil edin" : "Bank kartını daxil edin";
+        inputBox.appendChild(inputField);
+        dynamicContainer.appendChild(inputBox);
+    });
+});
+
+sendBtn.addEventListener("click", () => {
+    const amount = parseFloat(withdrawInput.value);
+    if (!selectedMethod) {
+        alert("Ödəniş üsulunu seçin");
+        return;
+    }
+    if (isNaN(amount) || amount < 3) {
+        alert("Minimum çıxarış 3 ₼ olmalıdır");
+        return;
+    }
+    if (amount > balance) {
+        alert("Balans kifayət etmir");
+        return;
+    }
+
+    const inputValue = dynamicContainer.querySelector(".input-real").value.trim();
+    if (inputValue === "") {
+        alert("Zəhmət olmasa məlumatı daxil edin");
+        return;
+    }
+
+    // update balance
+    balance -= amount;
+    document.getElementById("balanceValue").textContent = balance.toFixed(3) + " ₼";
+
+    // add to history
+    const historyItem = document.createElement("div");
+    historyItem.style.marginTop = "10px";
+    historyItem.textContent = `${selectedMethod.textContent} üçün çıxarış: ${amount.toFixed(2)} ₼ — Gözləmədə...`;
+    historyList.appendChild(historyItem);
+
+    // simulate success after 2 hours (for demo use 10 sec)
+    if (balance >= 3) {
+        setTimeout(() => {
+            historyItem.textContent = `${selectedMethod.textContent} üçün çıxarış: ${amount.toFixed(2)} ₼ — Uğurlu ✅`;
+        }, 10000); // demo üçün 10 saniyə əvəzinə 2 saat ola bilər: 7200000
+    } else {
+        // balans azdırsa 10 saniyə sonra uğursuz
+        setTimeout(() => {
+            historyItem.textContent = `${selectedMethod.textContent} üçün çıxarış: ${amount.toFixed(2)} ₼ — Uğursuz ❌`;
+        }, 10000);
+    }
+
+    // reset inputs
+    withdrawInput.value = "";
+    dynamicContainer.innerHTML = "";
+    methods.forEach(m => m.classList.remove("selected"));
+    selectedMethod = null;
+});
 </script>
 
 </body>
