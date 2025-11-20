@@ -143,9 +143,7 @@ watchBtn.addEventListener("click",()=>{
             if(timeLeft<=0){
                 clearInterval(timer);
                 watchedAds++;
-                balance+=0.001;
                 document.getElementById("watchedCount").textContent=watchedAds;
-                document.getElementById("bal").textContent=balance.toFixed(3)+" ₼";
                 document.getElementById("progressBar").style.width=(watchedAds/totalAds*100)+"%";
                 saveUserData();
                 watchBtn.textContent="▶ İndi izlə";
@@ -155,7 +153,7 @@ watchBtn.addEventListener("click",()=>{
     });
 });
 
-// 🔥 Admin reset yoxlaması (səhifə yüklənəndə və pəncərə focus olduqda)
+// 🔥 Admin reset yoxlaması (interval ilə)
 function checkAdminReset(){
     if(localStorage.getItem("resetAds")==="1"){
         watchedAds=0;
@@ -165,8 +163,9 @@ function checkAdminReset(){
         localStorage.removeItem("resetAds");
     }
 }
-checkAdminReset();
-window.addEventListener("focus", checkAdminReset);
+
+// interval ilə hər 1 saniyə yoxla
+setInterval(checkAdminReset, 1000);
 
 // Anti zoom
 document.addEventListener("gesturestart", e=>e.preventDefault());
