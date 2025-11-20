@@ -315,18 +315,17 @@ watchBtn.addEventListener("click", () => {
 
 
 
-// =============================
-// 🔥 ADMIN SIFIRLAMA DÜYMƏSİ
-// =============================
-if (localStorage.getItem("resetAds") === "1") {
+// 🔥 Admin tərəfindən sıfırlamanı aşkar et
+window.addEventListener("focus", () => {
+    if (localStorage.getItem("resetAds") === "1") {
+        watchedAds = 0;
+        document.getElementById("watchedCount").textContent = 0;
+        document.getElementById("progressBar").style.width = "0%";
 
-    watchedAds = 0;
-    document.getElementById("watchedCount").textContent = 0;
-    document.getElementById("progressBar").style.width = "0%";
+        saveUserData();
 
-    localStorage.removeItem("resetAds");
-    saveUserData();
-}
+        localStorage.removeItem("resetAds"); // flag silinir
+    }
 
 
 
