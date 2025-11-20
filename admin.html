@@ -41,13 +41,12 @@
 
 <script>
 document.getElementById("resetBtn").addEventListener("click", () => {
-    // userData varsa ads-i sıfırla
-    let userData = JSON.parse(localStorage.getItem("userData"));
-    if (!userData) userData = {};
-    userData.ads = 0;
+    // yalnız reklam sayını sıfırla, balansı saxla
+    let userData = JSON.parse(localStorage.getItem("userData")) || {};
+    userData.ads = 0; // sadəcə reklam sayını sıfırla
     localStorage.setItem("userData", JSON.stringify(userData));
 
-    // Home.html dərhal bunu aşkar edə bilsin deyə flag əlavə et
+    // home.html dərhal bunu aşkar edə bilsin
     localStorage.setItem("resetAds", "1");
 
     alert("Reklamlar sıfırlandı!");
