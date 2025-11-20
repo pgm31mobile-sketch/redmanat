@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+<style>
+    body {
+        margin:0;
+        font-family: Arial, sans-serif;
+        background:#0d0d0d;
+        color:white;
+    }
+    .container {
+        padding:20px;
+        padding-bottom:80px;
+    }
+    .card {
+        background:#1a1a1a;
+        padding:15px;
+        border-radius:16px;
+        margin-bottom:15px;
+        box-shadow:0 0 8px rgba(0,0,0,0.4);
+    }
+    .card h2 {
+        margin:0 0 10px 0;
+        font-size:18px;
+    }
+    .card p {
+        margin:4px 0;
+        font-size:16px;
+    }
+    .user-list {
+        margin-top:10px;
+        max-height:300px;
+        overflow-y:auto;
+    }
+    .user-item {
+        padding:10px;
+        background:#111;
+        border-radius:12px;
+        margin-bottom:8px;
+    }
+    .user-item span {
+        display:block;
+        font-size:14px;
+        opacity:0.8;
+    }
+    @media(max-width:480px){
+        .card h2 { font-size:16px; }
+        .card p { font-size:14px; }
+        .user-item { font-size:14px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>Ümumi İstifadəçi Sayı</h2>
+        <p id="totalUsers">0</p>
+    </div>
+
+    <div class="card">
+        <h2>Ümumi Balans</h2>
+        <p id="totalBalance">0 ₼</p>
+    </div>
+
+    <div class="card">
+        <h2>Gündəlik İzlənmiş Reklamlar</h2>
+        <p id="totalAdsWatched">0</p>
+    </div>
+
+    <div class="card">
+        <h2>İstifadəçilər</h2>
+        <div class="user-list" id="userList">
+            <p style="opacity:0.6;">İstifadəçi yoxdur</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Demo üçün LocalStorage-də users array
+if(!localStorage.getItem("users")){
+    const demoUsers = [
+        {name:"User1", balans:12.5, adsWatchedToday:3},
+        {name:"User2", balans:8.75, adsWatchedToday:5},
+        {name:"User3", balans:20, adsWatchedToday:2}
+    ];
+    localStorage.setItem("users", JSON.stringify(demoUsers));
+}
+
+// LocalStorage-dan istifadəçiləri oxu
+const users = JSON.parse(localStorage.getItem("users")) || [];
+
+// Ümumi istifadəçi sayı
+document.getElementById("totalUsers").textContent = users.length;
+
+// Ümumi balans
+const totalBalance = users.reduce((sum,user)=>sum + (user.balans||0),0);
+document.getElementById("totalBalance").textContent = totalBalance.toFixed(2) + " ₼";
+
+// Gündəlik izlənmiş reklamlar
+const totalAds = users.reduce((sum,user)=>sum + (user.adsWatchedToday||0),0);
+document.getElementById("totalAdsWatched").textContent = totalAds;
+
+// İstifadəçi siyahısı
+const userList = document.getElementById("userList");
+userList.innerHTML = "";
+if(users.length === 0){
+    userList.innerHTML = "<p style='opacity:0.6;'>İstifadəçi yoxdur</p>";
+}else{
+    users.forEach(user=>{
+        const div = document.createElement("div");
+        div.classList.add("user-item");
+        div.innerHTML = `<strong>${user.name}</strong>
+                         <span>Balans: ${user.balans.toFixed(2)} ₼</span>
+                         <span>Gündəlik reklam: ${user.adsWatchedToday}</span>`;
+        userList.appendChild(div);
+    });
+}
+</script>
+
+</body>
+</html>
