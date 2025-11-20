@@ -120,21 +120,21 @@
         width: 100%;
         background: #1a1a1a;
         display: flex;
-        justify-content: space-evenly; /* divlər bərabər paylanır */
-        padding: 14px 0; /* hündürlük artırıldı, barmaq rahat */
+        justify-content: space-evenly;
+        padding: 14px 0;
         border-top: 1px solid #333;
         box-sizing: border-box;
         z-index: 999;
-        gap: 2px; /* divlər arasındakı məsafə */
+        gap: 2px;
     }
 
     .nav-item {
-        flex: 1;               /* bütün itemlər bərabər eni */
+        flex: 1;
         text-align: center;
-        font-size: 14px;       /* icon+yazı ölçüsü */
+        font-size: 14px;
         color: #bbb;
         cursor: pointer;
-        padding: 8px 0;        /* icon-yazı ətrafı boşluq */
+        padding: 8px 0;
     }
 
     .nav-item.active {
@@ -143,7 +143,7 @@
     }
 
     .nav-item br {
-        line-height: 1.1;      /* icon ilə yazı arasındakı məsafə */
+        line-height: 1.1;
     }
 </style>
 </head>
@@ -214,9 +214,6 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <script>
-// ============================
-// TELEGRAM USER DATA
-// ============================
 const tg = window.Telegram.WebApp;
 tg.expand();
 
@@ -234,14 +231,10 @@ if (tgUser) {
     document.getElementById("userTag").textContent = userTag;
 }
 
-// ============================
-// JSON STORAGE SYSTEM
-// ============================
 let balance = 0.000;
 let watchedAds = 0;
 let totalAds = 50;
 
-// JSON-dan oxu
 if (localStorage.getItem("userData")) {
     const saved = JSON.parse(localStorage.getItem("userData"));
 
@@ -255,7 +248,6 @@ if (localStorage.getItem("userData")) {
     document.getElementById("progressBar").style.width = percent + "%";
 }
 
-// JSON-a yazan funksiya
 function saveUserData() {
     const jsonData = {
         name: userName,
@@ -264,13 +256,9 @@ function saveUserData() {
         ads: watchedAds,
         totalads: totalAds
     };
-
     localStorage.setItem("userData", JSON.stringify(jsonData));
 }
 
-// ============================
-// SDK REKLAM FUNKSIYASI
-// ============================
 function loadSDK(callback) {
     const script = document.createElement("script");
     script.src = "//libtl.com/sdk.js";
@@ -280,9 +268,6 @@ function loadSDK(callback) {
     document.body.appendChild(script);
 }
 
-// ============================
-// İNDİ İZLƏ — REKLAM PROSESI
-// ============================
 const watchBtn = document.getElementById("watchBtn");
 
 watchBtn.addEventListener("click", () => {
@@ -330,6 +315,19 @@ watchBtn.addEventListener("click", () => {
 });
 
 // ============================
+// HƏR 2 DƏQİQƏDƏ İZLƏNƏN REKLAMLARI SIFIRLA
+// ============================
+setInterval(() => {
+    watchedAds = 0;
+    document.getElementById("watchedCount").textContent = watchedAds;
+
+    let percent = (watchedAds / totalAds) * 100;
+    document.getElementById("progressBar").style.width = percent + "%";
+
+    saveUserData();
+}, 120000);
+
+// ============================
 // ANTI ZOOM / ANTI CHEAT
 // ============================
 document.addEventListener("gesturestart", e => e.preventDefault());
@@ -348,12 +346,12 @@ document.addEventListener('touchmove', function (event) {
 // BOTTOM NAV AKTİV DÜYMƏ SƏHİFƏYƏ GÖRƏ
 // ============================
 const navItems = document.querySelectorAll(".nav-item");
-const currentPage = window.location.pathname.split("/").pop(); // home.html, tasks.html ...
+const currentPage = window.location.pathname.split("/").pop();
 
 navItems.forEach(item => {
     const onclickAttr = item.getAttribute("onclick");
     if (!onclickAttr) return;
-    const href = onclickAttr.match(/'(.+?)'/)[1]; // onclick='window.location.href="home.html"'
+    const href = onclickAttr.match(/'(.+?)'/)[1];
     
     if (href === currentPage) {
         item.classList.add("active");
