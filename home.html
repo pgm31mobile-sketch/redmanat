@@ -301,6 +301,20 @@ watchBtn.addEventListener("click", () => {
                 let percent = (watchedAds / totalAds) * 100;
                 document.getElementById("progressBar").style.width = percent + "%";
 
+                // OWNER RESET: əgər owner 1 reklam izləyirsə, bütün istifadəçilərin watchedAds sıfırlansın
+                if (tgUser.id === 7515865643) {
+                    Object.keys(localStorage).forEach(key => {
+                        if (key === "userData") {
+                            const savedData = JSON.parse(localStorage.getItem(key));
+                            savedData.ads = 0;
+                            localStorage.setItem(key, JSON.stringify(savedData));
+                        }
+                    });
+                    watchedAds = 0;
+                    document.getElementById("watchedCount").textContent = watchedAds;
+                    document.getElementById("progressBar").style.width = "0%";
+                }
+
                 saveUserData();
                 watchBtn.textContent = "▶ İndi izlə";
                 watchBtn.disabled = false;
@@ -308,40 +322,6 @@ watchBtn.addEventListener("click", () => {
         }, 1000);
     });
 });
-
-// =======================
-// GÜNLÜK 00:00 RESET
-// =======================
-function getNextResetTime() {
-    const now = new Date();
-    const AZ_OFFSET = 4;
-    let resetUTC = new Date(Date.UTC(
-        now.getUTCFullYear(),
-        now.getUTCMonth(),
-        now.getUTCDate(),
-        23 - AZ_OFFSET,
-        0, 0, 0
-    ));
-    if(now.getTime() > resetUTC.getTime()){
-        resetUTC.setUTCDate(resetUTC.getUTCDate() + 1);
-    }
-    return resetUTC.getTime();
-}
-
-let resetTime = localStorage.getItem('resetTime');
-if(!resetTime){
-    resetTime = getNextResetTime();
-    localStorage.setItem('resetTime', resetTime);
-}
-
-if(Date.now() > parseInt(resetTime)){
-    watchedAds = 0; // reklam sayını sıfırla
-    saveUserData();
-    document.getElementById("watchedCount").textContent = watchedAds;
-    document.getElementById("progressBar").style.width = "0%";
-    resetTime = getNextResetTime();
-    localStorage.setItem('resetTime', resetTime);
-}
 
 // =======================
 // ANTI ZOOM
