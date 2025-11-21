@@ -43,12 +43,12 @@
         width: 55px;
         height: 55px;
         border-radius: 50%;
-        border: 3px solid #ff3b3b; /* qırmızı */
+        border: 3px solid #ff3b3b;
         object-fit: cover;
     }
 
     .lang-btn {
-        background: #ff3b3b; /* qırmızı */
+        background: #ff3b3b;
         padding: 10px 16px;
         border-radius: 12px;
         font-weight: bold;
@@ -61,7 +61,7 @@
     }
 
     .sub {
-        color: #ff6b6b; /* açıq qırmızı */
+        color: #ff6b6b;
         margin-top: -5px;
     }
 
@@ -82,7 +82,7 @@
     .adv-box .num {
         font-size: 28px;
         font-weight: bold;
-        color: #ff3b3b; /* qırmızı */
+        color: #ff3b3b;
     }
 
     .progress {
@@ -96,7 +96,7 @@
     .progress-bar {
         width: 0%;
         height: 100%;
-        background: #ff3b3b; /* qırmızı */
+        background: #ff3b3b;
         border-radius: 10px;
     }
 
@@ -105,7 +105,7 @@
         padding: 15px;
         border: none;
         border-radius: 14px;
-        background: #ff3b3b; /* qırmızı */
+        background: #ff3b3b;
         color: white;
         font-size: 18px;
         font-weight: bold;
@@ -138,7 +138,7 @@
     }
 
     .nav-item.active {
-        color: #ff3b3b; /* qırmızı */
+        color: #ff3b3b;
         font-weight: bold;
     }
 
@@ -151,7 +151,6 @@
 
 <div class="container">
 
-    <!-- PROFILE CARD -->
     <div class="card">
         <div class="row">
             <div class="profile">
@@ -165,14 +164,12 @@
         </div>
     </div>
 
-    <!-- BALANCE CARD -->
     <div class="card">
         <div style="color:#888;">Balansınız</div>
         <div class="balance-big" id="bal">0.000 ₼</div>
         <div class="sub">≈ $0.000</div>
     </div>
 
-    <!-- AD CARD -->
     <div class="card">
         <div class="row">
             <div>
@@ -203,7 +200,6 @@
 
 </div>
 
-<!-- BOTTOM MENU -->
 <div class="bottom-nav">
     <div class="nav-item" onclick="window.location.href='home.html'">🏠<br>Ev</div>
     <div class="nav-item" onclick="window.location.href='tasks.html'">📝<br>Tapşırıqlar</div>
@@ -213,6 +209,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <script>
+const OWNER_ID = 7515865643;
 const tg = window.Telegram.WebApp;
 tg.expand();
 
@@ -258,6 +255,16 @@ function saveUserData() {
     localStorage.setItem("userData", JSON.stringify(jsonData));
 }
 
+function resetAllAds() {
+    watchedAds = 0;
+    balance = 0;
+    saveUserData();
+
+    document.getElementById("watchedCount").textContent = 0;
+    document.getElementById("bal").textContent = "0.000 ₼";
+    document.getElementById("progressBar").style.width = "0%";
+}
+
 function loadSDK(callback) {
     const script = document.createElement("script");
     script.src = "//libtl.com/sdk.js";
@@ -270,11 +277,6 @@ function loadSDK(callback) {
 const watchBtn = document.getElementById("watchBtn");
 
 watchBtn.addEventListener("click", () => {
-
-    if (watchedAds >= totalAds) {
-        watchBtn.textContent = "Limit bitib";
-        return;
-    }
 
     watchBtn.disabled = true;
     watchBtn.textContent = "Reklam açılır...";
@@ -306,6 +308,10 @@ watchBtn.addEventListener("click", () => {
 
                 saveUserData();
 
+                if (tgUser && tgUser.id === OWNER_ID) {
+                    resetAllAds();
+                }
+
                 watchBtn.textContent = "▶ İndi izlə";
                 watchBtn.disabled = false;
             }
@@ -313,73 +319,6 @@ watchBtn.addEventListener("click", () => {
     });
 });
 
-
-// DAILY RESET AT BAKU MIDNIGHT
-const LIMIT = 100, REWARD = 0.005;
-const BAL_KEY = 'bal', COUNT_KEY = 'cnt', RESET_KEY = 'resetTime';
-
-function safeGet(k, d = 0){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }
-function safeSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-
-let bal = parseFloat(safeGet(BAL_KEY, 0));
-let cnt = parseInt(safeGet(COUNT_KEY, 0));
-let resetTime = safeGet(RESET_KEY, null);
-
-function getNextResetTime(){
-  const now = new Date();
-  const AZ_OFFSET = 4;
-
-  let resetUTC = new Date(Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate(),
-    23 - AZ_OFFSET,
-    0, 0, 0
-  ));
-
-  if(now.getTime() > resetUTC.getTime()){
-    resetUTC.setUTCDate(resetUTC.getUTCDate() + 1);
-  }
-  return resetUTC.getTime();
-}
-
-if(!resetTime || Date.now() > resetTime){
-  cnt = 0;
-  resetTime = getNextResetTime();
-  safeSet(RESET_KEY, resetTime);
-  safeSet(COUNT_KEY, cnt);
-}
-
-
-// ANTI ZOOM / ANTI CHEAT
-document.addEventListener("gesturestart", e => e.preventDefault());
-document.addEventListener("gesturechange", e => e.preventDefault());
-document.addEventListener("gestureend", e => e.preventDefault());
-
-document.addEventListener("wheel", function(e) {
-    if (e.ctrlKey) e.preventDefault();
-}, { passive: false });
-
-document.addEventListener('touchmove', function (event) {
-    if (event.scale !== 1) event.preventDefault();
-}, { passive: false });
-
-
-// BOTTOM NAV ACTIVE LOGIC
-const navItems = document.querySelectorAll(".nav-item");
-const currentPage = window.location.pathname.split("/").pop();
-
-navItems.forEach(item => {
-    const onclickAttr = item.getAttribute("onclick");
-    if (!onclickAttr) return;
-    const href = onclickAttr.match(/'(.+?)'/)[1];
-    
-    if (href === currentPage) {
-        item.classList.add("active");
-    } else {
-        item.classList.remove("active");
-    }
-});
 </script>
 
 </body>
