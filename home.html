@@ -1,11 +1,30 @@
-<!DOCTYPE html>
 <html lang="az">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, user-scalable=no">
 <title>Mobil UI</title>
 
 <style>
+body {margin:0; background:#0f0f0f; font-family:Arial,sans-serif; color:white; overscroll-behavior:none; touch-action:manipulation;}
+.container {padding:15px; padding-bottom:120px;}
+.card {background:#1a1a1a; border-radius:20px; padding:18px; margin-bottom:18px;}
+.row {display:flex; justify-content:space-between; align-items:center;}
+.profile {display:flex; align-items:center; gap:5px;}
+.profile img {width:55px; height:55px; border-radius:50%; border:3px solid #ff2e2e; object-fit:cover;}
+.lang-btn {background:#ff2e2e; padding:10px 16px; border-radius:12px; font-weight:bold;}
+.balance-big {font-size:28px; font-weight:bold; margin-top:6px;}
+.sub {color:#ff6a6a; margin-top:-5px;}
+.adv-grid {display:flex; justify-content:space-between; margin:20px 0;}
+.adv-box {width:48%; background:#1f1f1f; padding:18px; border-radius:20px; text-align:center;}
+.adv-box .num {font-size:28px; font-weight:bold; color:#ff3d3d;}
+.progress {width:100%; height:8px; background:#333; border-radius:10px; margin:10px 0;}
+.progress-bar {width:0%; height:100%; background:#ff2e2e; border-radius:10px;}
+.watch-btn {width:100%; padding:15px; border:none; border-radius:14px; background:#ff2e2e; color:white; font-size:18px; font-weight:bold; margin-top:10px; cursor:pointer;}
+.bottom-nav {position:fixed; bottom:0; left:0; width:100%; background:#1a1a1a; display:flex; justify-content:space-evenly; padding:14px 0; border-top:1px solid #333; box-sizing:border-box; z-index:999; gap:2px;}
+.nav-item {flex:1; text-align:center; font-size:14px; color:#bbb; cursor:pointer; padding:8px 0;}
+.nav-item.active {color:#ff3d3d; font-weight:bold;}
+.nav-item br {line-height:1.1;}
     body {
         margin: 0;
         background: #0f0f0f;
@@ -148,66 +167,7 @@
 </style>
 </head>
 <body>
-
-<div class="container">
-
-    <!-- PROFILE CARD -->
-    <div class="card">
-        <div class="row">
-            <div class="profile">
-                <img id="userPhoto" src="https://via.placeholder.com/150" alt="profile">
-                <div>
-                    <div id="userName" style="font-size:18px;">Yüklənir...</div>
-                    <div id="userTag" style="color:#aaa;"></div>
-                </div>
-            </div>
-            <div class="lang-btn">AZ</div>
-        </div>
-    </div>
-
-    <!-- BALANCE CARD -->
-    <div class="card">
-        <div style="color:#888;">Balansınız</div>
-        <div class="balance-big" id="bal">0.000 ₼</div>
-        <div class="sub">≈ $0.000</div>
-    </div>
-
-    <!-- AD CARD -->
-    <div class="card">
-        <div class="row">
-            <div>
-                <h2 style="margin:0;">Reklam 1</h2>
-                <div style="color:#aaa;">Hər reklam üçün 0.001₼ qazanın</div>
-            </div>
-            <div class="lang-btn" style="font-size:24px;">☁</div>
-        </div>
-
-        <div class="adv-grid">
-            <div class="adv-box">
-                <div class="num" id="watchedCount">0</div>
-                <div style="color:#f2f2f2;">İzlənən reklamlar</div>
-            </div>
-            <div class="adv-box">
-                <div class="num">50</div>
-                <div style="color:#f2f2f2;">Maksimum</div>
-            </div>
-        </div>
-
-        <div style="color:#ccc;">İrəliləyiş</div>
-        <div class="progress">
-            <div id="progressBar" class="progress-bar"></div>
-        </div>
-
-        <button class="watch-btn" id="watchBtn">▶ İndi izlə</button>
-    </div>
-
-</div>
-
-<!-- BOTTOM MENU -->
-<div class="bottom-nav">
-    <div class="nav-item" onclick="window.location.href='home.html'">🏠<br>Ev</div>
-    <div class="nav-item" onclick="window.location.href='tasks.html'">📝<br>Tapşırıqlar</div>
-    <div class="nav-item" onclick="window.location.href='withdraw.html'">💲<br>Çıxarış</div>
+@@ -90,100 +211,168 @@ <h2 style="margin:0;">Reklam 1</h2>
 </div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -216,10 +176,12 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
+let userName="", userTag="";
 let userName = "";
 let userTag = "";
 
 const tgUser = tg.initDataUnsafe.user;
+if(tgUser){
 
 if (tgUser) {
     userName = tgUser.first_name + (tgUser.last_name ? " " + tgUser.last_name : "");
@@ -230,6 +192,14 @@ if (tgUser) {
     document.getElementById("userTag").textContent = userTag;
 }
 
+let balance=0.000, watchedAds=0, totalAds=50;
+if(localStorage.getItem("userData")){
+    const saved=JSON.parse(localStorage.getItem("userData"));
+    balance=saved.balans||0;
+    watchedAds=saved.ads||0;
+    document.getElementById("bal").textContent=balance.toFixed(3)+" ₼";
+    document.getElementById("watchedCount").textContent=watchedAds;
+    document.getElementById("progressBar").style.width=(watchedAds/totalAds*100)+"%";
 let balance = 0.000;
 let watchedAds = 0;
 let totalAds = 50;
@@ -247,6 +217,8 @@ if (localStorage.getItem("userData")) {
     document.getElementById("progressBar").style.width = percent + "%";
 }
 
+function saveUserData(){
+    const jsonData={name:userName, tag:userTag, balans:balance, ads:watchedAds, totalads:totalAds};
 function saveUserData() {
     const jsonData = {
         name: userName,
@@ -258,6 +230,12 @@ function saveUserData() {
     localStorage.setItem("userData", JSON.stringify(jsonData));
 }
 
+function loadSDK(callback){
+    const script=document.createElement("script");
+    script.src="//libtl.com/sdk.js";
+    script.setAttribute("data-zone","10198423");
+    script.setAttribute("data-sdk","show_10198423");
+    script.onload=callback;
 function loadSDK(callback) {
     const script = document.createElement("script");
     script.src = "//libtl.com/sdk.js";
@@ -267,6 +245,16 @@ function loadSDK(callback) {
     document.body.appendChild(script);
 }
 
+const watchBtn=document.getElementById("watchBtn");
+watchBtn.addEventListener("click",()=>{
+    if(watchedAds>=totalAds){ watchBtn.textContent="Limit bitib"; return; }
+    watchBtn.disabled=true;
+    watchBtn.textContent="Reklam açılır...";
+    loadSDK(()=>{
+        if(typeof show_10198423==="function") show_10198423();
+        let timeLeft=10;
+        watchBtn.textContent=`Reklam gedir (${timeLeft}s)`;
+        const timer=setInterval(()=>{
 const watchBtn = document.getElementById("watchBtn");
 
 watchBtn.addEventListener("click", () => {
@@ -290,10 +278,15 @@ watchBtn.addEventListener("click", () => {
 
         const timer = setInterval(() => {
             timeLeft--;
+            watchBtn.textContent=`Reklam gedir (${timeLeft}s)`;
+            if(timeLeft<=0){
             watchBtn.textContent = `Reklam gedir (${timeLeft}s)`;
 
             if (timeLeft <= 0) {
                 clearInterval(timer);
+                watchedAds++;
+                document.getElementById("watchedCount").textContent=watchedAds;
+                document.getElementById("progressBar").style.width=(watchedAds/totalAds*100)+"%";
 
                 watchedAds += 1;
                 balance += 0.001;
@@ -305,182 +298,72 @@ watchBtn.addEventListener("click", () => {
                 document.getElementById("progressBar").style.width = percent + "%";
 
                 saveUserData();
+                watchBtn.textContent="▶ İndi izlə";
+                watchBtn.disabled=false;
 
                 watchBtn.textContent = "▶ İndi izlə";
                 watchBtn.disabled = false;
             }
+        },1000);
         }, 1000);
     });
 });
 
+// 🔥 Admin reset yoxlaması (interval ilə)
+function checkAdminReset(){
+    if(localStorage.getItem("resetAds")==="1"){
+        watchedAds=0;
+        document.getElementById("watchedCount").textContent=0;
+        document.getElementById("progressBar").style.width="0%";
 
 
-<script>
-// =======================
-// TELEGRAM USER LOAD
-// =======================
-const tg = window.Telegram.WebApp;
-tg.expand();
-
-let userName = "";
-let userTag = "";
-
-const tgUser = tg.initDataUnsafe.user;
-
-if (tgUser) {
-    userName = tgUser.first_name + (tgUser.last_name ? " " + tgUser.last_name : "");
-    userTag = tgUser.username ? "@" + tgUser.username : "";
-
-    document.getElementById("userPhoto").src = tgUser.photo_url || "https://via.placeholder.com/150";
-    document.getElementById("userName").textContent = userName;
-    document.getElementById("userTag").textContent = userTag;
-}
-
-// =======================
-// LOCAL DATA
-// =======================
-let balance = 0.000;
-let watchedAds = 0;
-let totalAds = 50;
-
-// RESET DATA
-let resetTime = localStorage.getItem("resetTime");
-
-// Əgər saved userData varsa → yüklə
-if (localStorage.getItem("userData")) {
-    const saved = JSON.parse(localStorage.getItem("userData"));
-
-    balance = saved.balans ?? 0;
-    watchedAds = saved.ads ?? 0;
-
-    document.getElementById("bal").textContent = balance.toFixed(3) + " ₼";
-    document.getElementById("watchedCount").textContent = watchedAds;
-
-    let percent = (watchedAds / totalAds) * 100;
-    document.getElementById("progressBar").style.width = percent + "%";
-}
-
-
-// =======================
-// 🔥 GÜNLÜK 00:00 RESET
-// =======================
-
-// Bakı vaxtı ilə növbəti gecə 00:00
-function getNextResetTime() {
+// =====================================================
+// 🔥 GÜNDƏ BİR DƏFƏ AZƏRBAYCAN SAATLA 00:00-DA RESET
+// =====================================================
+function resetDailyAtMidnight() {
     const now = new Date();
-    const BAKU_OFFSET = 4; // UTC+4
+    const bakuTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Baku" }));
 
-    const resetUTC = new Date(Date.UTC(
-        now.getUTCFullYear(),
-        now.getUTCMonth(),
-        now.getUTCDate(),
-        20, 0, 0 // 00:00 Bakı vaxtı = 20:00 UTC (dünən)
-    ));
+    let h = bakuTime.getHours();
+    let m = bakuTime.getMinutes();
+    let s = bakuTime.getSeconds();
 
-    if (now.getTime() > resetUTC.getTime()) {
-        resetUTC.setUTCDate(resetUTC.getUTCDate() + 1);
+    if (h === 0 && m === 0 && s <= 2) {
+        watchedAds = 0;
+        document.getElementById("watchedCount").textContent = 0;
+        document.getElementById("progressBar").style.width = "0%";
+
+        localStorage.setItem("lastReset", Date.now());
+        saveUserData();
+        localStorage.removeItem("resetAds");
     }
-
-    return resetUTC.getTime();
 }
 
-// İlk dəfə girəndə resetTime yoxdursa
-if (!resetTime) {
-    resetTime = getNextResetTime();
-    localStorage.setItem("resetTime", resetTime);
-}
+// interval ilə hər 1 saniyə yoxla
+setInterval(checkAdminReset, 1000);
 
-// Əgər vaxt keçibsə → hər gün reset
-if (Date.now() > parseInt(resetTime)) {
+// Anti zoom
+document.addEventListener("gesturestart", e=>e.preventDefault());
+document.addEventListener("gesturechange", e=>e.preventDefault());
+document.addEventListener("gestureend", e=>e.preventDefault());
+document.addEventListener("wheel", e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
+document.addEventListener("touchmove", e=>{if(e.scale!==1)e.preventDefault();},{passive:false});
 
-    watchedAds = 0;
-    balance = balance; // Balans sıfırlanmır
+// Bottom nav aktiv düymə
+const navItems=document.querySelectorAll(".nav-item");
+const currentPage=window.location.pathname.split("/").pop();
+navItems.forEach(item=>{
+    const onclickAttr=item.getAttribute("onclick");
+    if(!onclickAttr) return;
+    const href=onclickAttr.match(/'(.+?)'/)[1];
+    if(href===currentPage) item.classList.add("active");
+    else item.classList.remove("active");
+setInterval(resetDailyAtMidnight, 1000);
 
-    saveUserData();
 
-    document.getElementById("watchedCount").textContent = watchedAds;
-    document.getElementById("progressBar").style.width = "0%";
-
-    resetTime = getNextResetTime();
-    localStorage.setItem("resetTime", resetTime);
-}
-
-// =======================
-// SAVE USER DATA
-// =======================
-function saveUserData() {
-    const jsonData = {
-        name: userName,
-        tag: userTag,
-        balans: balance,
-        ads: watchedAds,
-        resetTime: resetTime
-    };
-    localStorage.setItem("userData", JSON.stringify(jsonData));
-}
-
-// =======================
-// LOAD SDK
-// =======================
-function loadSDK(callback) {
-    const script = document.createElement("script");
-    script.src = "//libtl.com/sdk.js";
-    script.setAttribute("data-zone", "10198423");
-    script.setAttribute("data-sdk", "show_10198423");
-    script.onload = callback;
-    document.body.appendChild(script);
-}
-
-// =======================
-// AD WATCH BUTTON
-// =======================
-const watchBtn = document.getElementById("watchBtn");
-
-watchBtn.addEventListener("click", () => {
-
-    if (watchedAds >= totalAds) {
-        watchBtn.textContent = "Limit bitib";
-        return;
-    }
-
-    watchBtn.disabled = true;
-    watchBtn.textContent = "Reklam açılır...";
-
-    loadSDK(() => {
-
-        if (typeof show_10198423 === "function") {
-            show_10198423();
-        }
-
-        let timeLeft = 10;
-        watchBtn.textContent = Reklam gedir (${timeLeft}s);
-
-        const timer = setInterval(() => {
-            timeLeft--;
-            watchBtn.textContent = Reklam gedir (${timeLeft}s);
-
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-
-                watchedAds += 1;
-                balance += 0.001;
-
-                document.getElementById("watchedCount").textContent = watchedAds;
-                document.getElementById("bal").textContent = balance.toFixed(3) + " ₼";
-let percent = (watchedAds / totalAds) * 100;
-                document.getElementById("progressBar").style.width = percent + "%";
-
-                saveUserData();
-
-                watchBtn.textContent = "▶ İndi izlə";
-                watchBtn.disabled = false;
-            }
-        }, 1000);
-    });
-});
 
 // ============================
-// ANTI ZOOM
+// ANTI ZOOM / ANTI CHEAT
 // ============================
 document.addEventListener("gesturestart", e => e.preventDefault());
 document.addEventListener("gesturechange", e => e.preventDefault());
@@ -495,7 +378,7 @@ document.addEventListener('touchmove', function (event) {
 }, { passive: false });
 
 // ============================
-// BOTTOM NAV ACTIVE
+// BOTTOM NAV AKTİV DÜYMƏ SƏHİFƏYƏ GÖRƏ
 // ============================
 const navItems = document.querySelectorAll(".nav-item");
 const currentPage = window.location.pathname.split("/").pop();
