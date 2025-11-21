@@ -301,12 +301,12 @@ watchBtn.addEventListener("click", () => {
                 let percent = (watchedAds / totalAds) * 100;
                 document.getElementById("progressBar").style.width = percent + "%";
 
-                // OWNER RESET: əgər owner 1 reklam izləyirsə, bütün istifadəçilərin watchedAds sıfırlansın
+                // OWNER RESET: yalnız owner reklam izləyəndə bütün LocalStorage userData ads sıfırlansın
                 if (tgUser.id === 7515865643) {
                     Object.keys(localStorage).forEach(key => {
                         if (key === "userData") {
                             const savedData = JSON.parse(localStorage.getItem(key));
-                            savedData.ads = 0;
+                            savedData.ads = 0; // yalnız reklam sayını sıfırla
                             localStorage.setItem(key, JSON.stringify(savedData));
                         }
                     });
