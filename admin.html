@@ -1,1 +1,316 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
 
+<style>
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-container {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 400px;
+}
+
+.admin-panel {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 500px;
+    display: none;
+}
+
+h1 {
+    color: #667eea;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input[type="password"] {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border 0.3s;
+}
+
+input[type="password"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn {
+    width: 100%;
+    padding: 15px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background: #5568d3;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    margin-bottom: 15px;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-logout {
+    background: #95a5a6;
+}
+
+.btn-logout:hover {
+    background: #7f8c8d;
+}
+
+.error {
+    color: #e74c3c;
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.success {
+    color: #27ae60;
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.info-box {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.info-label {
+    color: #666;
+    font-weight: bold;
+}
+
+.info-value {
+    color: #333;
+    font-weight: bold;
+}
+
+.warning {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    color: #856404;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+</style>
+</head>
+<body>
+
+<!-- Login Ekranı -->
+<div class="login-container" id="loginContainer">
+    <h1>🔐 Admin Girişi</h1>
+    <div class="input-group">
+        <label for="passwordInput">Şifrə daxil edin:</label>
+        <input type="password" id="passwordInput" placeholder="Şifrəni daxil edin">
+    </div>
+    <button class="btn" onclick="checkPassword()">Daxil ol</button>
+    <div id="errorMsg" class="error hidden">Yanlış şifrə!</div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-panel" id="adminPanel">
+    <h1>⚙️ Admin Panel</h1>
+    
+    <div class="info-box">
+        <div class="info-item">
+            <span class="info-label">Yüklənmiş istifadəçilər:</span>
+            <span class="info-value" id="userCount">0</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Son sıfırlama:</span>
+            <span class="info-value" id="lastReset">Heç vaxt</span>
+        </div>
+    </div>
+
+    <div class="warning">
+        ⚠️ Bu əməliyyat bütün istifadəçilərin reklam limitini sıfırlayacaq!
+    </div>
+
+    <button class="btn btn-danger" onclick="resetAllLimits()">
+        🔄 Bütün Reklam Limitlərini Sıfırla
+    </button>
+
+    <button class="btn btn-logout" onclick="logout()">
+        🚪 Çıxış
+    </button>
+
+    <div id="successMsg" class="success hidden"></div>
+</div>
+
+<script>
+const ADMIN_PASSWORD = "redmanat2025";
+  // Səhifə yüklənəndə admin sessiyanı yoxla
+window.onload = function() {
+    if (sessionStorage.getItem("adminLoggedIn") === "true") {
+        showAdminPanel();
+        updateStats();
+    }
+};
+
+function checkPassword() {
+    const input = document.getElementById("passwordInput");
+    const errorMsg = document.getElementById("errorMsg");
+    
+    if (input.value === ADMIN_PASSWORD) {
+        sessionStorage.setItem("adminLoggedIn", "true");
+        errorMsg.classList.add("hidden");
+        showAdminPanel();
+        updateStats();
+    } else {
+        errorMsg.classList.remove("hidden");
+        input.value = "";
+        input.focus();
+    }
+}
+
+function showAdminPanel() {
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+}
+
+function updateStats() {
+    // localStorage-dəki istifadəçi sayını hesabla
+    let userCount = 0;
+    if (localStorage.getItem("userData")) {
+        userCount = 1;
+    }
+    
+    document.getElementById("userCount").textContent = userCount;
+    
+    // Son sıfırlama tarixini göstər
+    const lastReset = localStorage.getItem("lastAdReset");
+    if (lastReset) {
+        document.getElementById("lastReset").textContent = lastReset;
+    }
+}
+
+function resetAllLimits() {
+    if (!confirm("Əminsiniz? Bu əməliyyat geri alına bilməz!")) {
+        return;
+    }
+
+    const successMsg = document.getElementById("successMsg");
+    
+    // Bütün localStorage açarlarını tap
+    const keys = Object.keys(localStorage);
+    let resetCount = 0;
+    
+    keys.forEach(key => {
+        if (key === "userData" || key.startsWith("user_")) {
+            try {
+                const data = JSON.parse(localStorage.getItem(key));
+                if (data && typeof data === "object") {
+                    // Reklam limitini sıfırla
+                    data.ads = 0;
+                    localStorage.setItem(key, JSON.stringify(data));
+                    resetCount++;
+                }
+            } catch (e) {
+                console.error("Xəta:", e);
+            }
+        }
+    });
+
+    // Son sıfırlama tarixini saxla
+    const now = new Date();
+    const dateStr = now.toLocaleString("az-AZ");
+    localStorage.setItem("lastAdReset", dateStr);
+    
+    // Uğurlu mesajı göstər
+    successMsg.textContent = ✅ ${resetCount} istifadəçinin reklam limiti sıfırlandı!;
+    successMsg.classList.remove("hidden");
+    
+    updateStats();
+    
+    // 3 saniyə sonra mesajı gizlət
+    setTimeout(() => {
+        successMsg.classList.add("hidden");
+    }, 3000);
+}
+
+function logout() {
+    sessionStorage.removeItem("adminLoggedIn");
+    document.getElementById("adminPanel").style.display = "none";
+    document.getElementById("loginContainer").style.display = "block";
+    document.getElementById("passwordInput").value = "";
+}
+
+// Enter düyməsi ilə giriş
+document.getElementById("passwordInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        checkPassword();
+    }
+});
+</script>
+
+</body>
+</html>
